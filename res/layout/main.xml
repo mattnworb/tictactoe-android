@@ -1,12 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
-    android:text="@string/hello"
-    />
-</LinearLayout>
+    <TableRow>
+		<ImageView
+			android:id="@+id/tile1"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile2"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile3"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+	</TableRow>
+	<TableRow>
+		<ImageView
+			android:id="@+id/tile4"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile5"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile6"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+	</TableRow>
+	<TableRow>
+		<ImageView
+			android:id="@+id/tile7"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile8"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+		<ImageView
+			android:id="@+id/tile9"
+			android:maxWidth="50px"
+			android:maxHeight="50px"
+			android:src="@drawable/empty"
+			android:layout_width="50px"
+			android:layout_height="50px"
+			/>
+	</TableRow>
+	<TextView
+		android:id="@+id/statusText"
+		android:layout_width="fill_parent"
+		android:text="@string/status_start"
+	/>
+</TableLayout>

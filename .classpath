@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-nop-1.6.0.jar"/>
+	<classpathentry kind="lib" path="lib/tictactoe-0.1.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
