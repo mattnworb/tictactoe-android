@@ -24,22 +24,26 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 	private static final int EVALUATION_PLY = 2;
 
-	private int[] imageIds = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4, R.id.tile5,
-			R.id.tile6, R.id.tile7, R.id.tile8, R.id.tile9 };
+	protected int[] imageIds = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4,
+			R.id.tile5, R.id.tile6, R.id.tile7, R.id.tile8, R.id.tile9 };
+
+	protected ImageView[] tileViews = new ImageView[imageIds.length];
 
 	private Map<Tile, Integer> resourceMap;
 
 	private Map<Tile, Tile> nextTileMap;
 
-	private TextView status;
+	protected TextView statusBar;
 
-	private Evaluation eval;
+	protected Evaluation eval;
 
-	private TicTacPlayer human;
+	protected TicTacPlayer human;
 
-	private TicTacPlayer computer;
+	protected TicTacPlayer computer;
 
-	private TicTacGameState state;
+	protected TicTacGameState state;
+
+	private View btnPlayAgain;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -63,13 +67,36 @@ public class GameActivity extends Activity implements View.OnClickListener {
 		computer = new TicTacPlayer(Tile.O);
 		state = new TicTacGameState();
 
-		status = (TextView) findViewById(R.id.statusText);
+		statusBar = (TextView) findViewById(R.id.statusText);
+		btnPlayAgain = findViewById(R.id.btnPlayAgain);
 
-		for (int id : imageIds) {
-			findViewById(id).setOnClickListener(this);
+		for (int i = 0; i < imageIds.length; i++) {
+			int id = imageIds[i];
+			Log.d(TAG, "finding id " + id);
+			tileViews[i] = (ImageView) findViewById(id);
+			tileViews[i].setOnClickListener(this);
 		}
 
+		btnPlayAgain.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				resetGame();
+			}
+		});
+
 		Log.d(TAG, "onCreate: complete");
+	}
+
+	protected void resetGame() {
+		for (ImageView tile : tileViews) {
+			tile.setImageResource(R.drawable.empty);
+			tile.setClickable(true);
+		}
+		statusBar.setText(R.string.status_start);
+		btnPlayAgain.setVisibility(View.INVISIBLE);
+
+		state = new TicTacGameState();
 	}
 
 	@Override
@@ -106,20 +133,20 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 	}
 
-	private void checkForGameOver() {
+	protected void checkForGameOver() {
 		boolean gameOver = false;
 
 		if (state.isDraw()) {
-			status.setText(R.string.status_draw);
+			statusBar.setText(R.string.status_draw);
 			gameOver = true;
 		}
 		else if (state.isWin()) {
 			gameOver = true;
 			if (state.isWinner(human)) {
-				status.setText(R.string.status_won);
+				statusBar.setText(R.string.status_won);
 			}
 			else {
-				status.setText(R.string.status_lost);
+				statusBar.setText(R.string.status_lost);
 			}
 		}
 
@@ -128,7 +155,9 @@ public class GameActivity extends Activity implements View.OnClickListener {
 			for (int id : imageIds) {
 				findViewById(id).setClickable(false);
 			}
+			btnPlayAgain.setVisibility(View.VISIBLE);
 		}
+
 	}
 
 	/**
@@ -142,7 +171,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 		@Override
 		protected void onPreExecute() {
-			status.setText(R.string.status_computer_thinking);
+			statusBar.setText(R.string.status_computer_thinking);
 		}
 
 		@Override
@@ -160,7 +189,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 			ImageView oppView = (ImageView) findViewById(imageIds[id]);
 			oppView.setImageResource(R.drawable.o);
 
-			status.setText(R.string.status_yourmove);
+			statusBar.setText(R.string.status_yourmove);
 
 			checkForGameOver();
 		}
