@@ -3,9 +3,10 @@ package brown.android.tictac;
 import java.util.HashMap;
 import java.util.Map;
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import brown.games.Evaluation;
@@ -16,9 +17,12 @@ import brown.games.tictac.TicTacGameState;
 import brown.games.tictac.TicTacPlayer;
 import brown.games.tictac.Tile;
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements View.OnClickListener {
 
-	private int[] images = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4, R.id.tile5,
+	/** Log tag */
+	private static final String TAG = "brown.GameActicity";
+
+	private int[] imageIds = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4, R.id.tile5,
 			R.id.tile6, R.id.tile7, R.id.tile8, R.id.tile9 };
 
 	private Map<Tile, Integer> resourceMap;
@@ -59,55 +63,50 @@ public class GameActivity extends Activity {
 
 		status = (TextView) findViewById(R.id.statusText);
 
-		OnClickListener clickListener = new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				ImageView thisImageView = (ImageView) v;
-
-				// find index in array
-				int ix = -1;
-				for (int i = 0; i < images.length; i++) {
-					if (images[i] == v.getId()) {
-						ix = i;
-						break;
-					}
-				}
-
-				GameMove move = new TicTacGameMove(human.getTile(), ix % 3, ix / 3);
-				if (move.isValid(state)) {
-					move.execute(state);
-					thisImageView.setImageResource(R.drawable.x);
-					thisImageView.invalidate();
-
-					if (!state.isDraw() && !state.isWin()) {
-						TicTacGameMove oppMove = (TicTacGameMove) eval.bestMove(state, computer,
-							human);
-						oppMove.execute(state);
-						// find tile of this move
-						final int id = oppMove.getRow() + oppMove.getColumn() * 3;
-						ImageView oppView = (ImageView) findViewById(images[id]);
-						oppView.setImageResource(R.drawable.o);
-						oppView.invalidate();
-
-						status.setText(R.string.status_yourmove);
-
-					}
-				}
-
-				checkForGameOver(human, state);
-
-			}
-
-		};
-
-		for (int id : images) {
-			findViewById(id).setOnClickListener(clickListener);
+		for (int id : imageIds) {
+			findViewById(id).setOnClickListener(this);
 		}
+
+		Log.d(TAG, "onCreate: complete");
 	}
 
-	private void checkForGameOver(TicTacPlayer human, TicTacGameState state) {
+	@Override
+	public void onClick(View v) {
+		Log.d(TAG, "onClick: " + v);
+		ImageView thisImageView = (ImageView) v;
+
+		// which view am i? find index in array
+		int ix = -1;
+		for (int i = 0; i < imageIds.length; i++) {
+			if (imageIds[i] == v.getId()) {
+				ix = i;
+				break;
+			}
+		}
+
+		// clicked on something other than game board
+		if (ix == -1) return;
+
+		int row = ix % 3;
+		int col = ix / 3;
+
+		GameMove move = new TicTacGameMove(human.getTile(), row, col);
+		if (move.isValid(state)) {
+			move.execute(state);
+			thisImageView.setImageResource(R.drawable.x);
+			checkForGameOver();
+			
+			if (!state.isDraw() && !state.isWin()) {
+				Log.d(TAG, "onClick: launching EvaluateMovesTask");
+				new EvaluateMovesTask().execute();
+			}
+		}
+
+		
+
+	}
+
+	private void checkForGameOver() {
 		boolean gameOver = false;
 
 		if (state.isDraw()) {
@@ -126,10 +125,41 @@ public class GameActivity extends Activity {
 
 		// remove onclick listeners
 		if (gameOver) {
-			for (int id : images) {
+			for (int id : imageIds) {
 				findViewById(id).setClickable(false);
 			}
 		}
+	}
+
+	/**
+	 * Executes evaluation of computer move on a background thread
+	 * 
+	 * @author Matt Brown msbcode@gmail.com
+	 * @date Jun 8, 2010
+	 */
+	// can i make this static?
+	private class EvaluateMovesTask extends AsyncTask<Void, Void, TicTacGameMove> {
+
+		@Override
+		protected TicTacGameMove doInBackground(Void... params) {
+			TicTacGameMove oppMove = (TicTacGameMove) eval.bestMove(state, computer, human);
+			oppMove.execute(state);
+
+			return oppMove;
+		}
+
+		@Override
+		protected void onPostExecute(TicTacGameMove result) {
+			// find tile of this move
+			final int id = result.getRow() + result.getColumn() * 3;
+			ImageView oppView = (ImageView) findViewById(imageIds[id]);
+			oppView.setImageResource(R.drawable.o);
+
+			status.setText(R.string.status_yourmove);
+
+			checkForGameOver();
+		}
+		
 	}
 
 }
