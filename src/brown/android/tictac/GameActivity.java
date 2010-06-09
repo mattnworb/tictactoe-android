@@ -22,6 +22,8 @@ public class GameActivity extends Activity implements View.OnClickListener {
 	/** Log tag */
 	private static final String TAG = "brown.GameActicity";
 
+	private static final int EVALUATION_PLY = 2;
+
 	private int[] imageIds = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4, R.id.tile5,
 			R.id.tile6, R.id.tile7, R.id.tile8, R.id.tile9 };
 
@@ -56,7 +58,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 		nextTileMap.put(Tile.O, null);
 
 		// TODO restorable state
-		eval = new MiniMaxEvaluation(2);
+		eval = new MiniMaxEvaluation(EVALUATION_PLY);
 		human = new TicTacPlayer(Tile.X);
 		computer = new TicTacPlayer(Tile.O);
 		state = new TicTacGameState();
@@ -95,14 +97,12 @@ public class GameActivity extends Activity implements View.OnClickListener {
 			move.execute(state);
 			thisImageView.setImageResource(R.drawable.x);
 			checkForGameOver();
-			
+
 			if (!state.isDraw() && !state.isWin()) {
 				Log.d(TAG, "onClick: launching EvaluateMovesTask");
 				new EvaluateMovesTask().execute();
 			}
 		}
-
-		
 
 	}
 
@@ -141,6 +141,11 @@ public class GameActivity extends Activity implements View.OnClickListener {
 	private class EvaluateMovesTask extends AsyncTask<Void, Void, TicTacGameMove> {
 
 		@Override
+		protected void onPreExecute() {
+			status.setText(R.string.status_computer_thinking);
+		}
+
+		@Override
 		protected TicTacGameMove doInBackground(Void... params) {
 			TicTacGameMove oppMove = (TicTacGameMove) eval.bestMove(state, computer, human);
 			oppMove.execute(state);
@@ -159,7 +164,7 @@ public class GameActivity extends Activity implements View.OnClickListener {
 
 			checkForGameOver();
 		}
-		
+
 	}
 
 }
