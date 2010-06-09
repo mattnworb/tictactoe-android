@@ -21,8 +21,6 @@ public class GameActivity extends Activity {
 	private int[] images = new int[]{ R.id.tile1, R.id.tile2, R.id.tile3, R.id.tile4, R.id.tile5,
 			R.id.tile6, R.id.tile7, R.id.tile8, R.id.tile9 };
 
-	private Tile[] tileState = new Tile[images.length];
-
 	private Map<Tile, Integer> resourceMap;
 
 	private Map<Tile, Tile> nextTileMap;
