@@ -25,7 +25,15 @@ public class GameActivity extends Activity {
 
 	private Map<Tile, Tile> nextTileMap;
 
-	private boolean gameOver = false;
+	private TextView status;
+
+	private Evaluation eval;
+
+	private TicTacPlayer human;
+
+	private TicTacPlayer computer;
+
+	private TicTacGameState state;
 
 	/** Called when the activity is first created. */
 	@Override
@@ -43,20 +51,20 @@ public class GameActivity extends Activity {
 		nextTileMap.put(Tile.X, Tile.O);
 		nextTileMap.put(Tile.O, null);
 
-		final Evaluation eval = new MiniMaxEvaluation(2);
-		final TicTacPlayer human = new TicTacPlayer(Tile.X);
-		final TicTacPlayer computer = new TicTacPlayer(Tile.O);
-		final TicTacGameState state = new TicTacGameState();
+		// TODO restorable state
+		eval = new MiniMaxEvaluation(2);
+		human = new TicTacPlayer(Tile.X);
+		computer = new TicTacPlayer(Tile.O);
+		state = new TicTacGameState();
+
+		status = (TextView) findViewById(R.id.statusText);
 
 		OnClickListener clickListener = new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
-				if (gameOver) return;
-
 				ImageView thisImageView = (ImageView) v;
-				TextView status = (TextView) findViewById(R.id.statusText);
 
 				// find index in array
 				int ix = -1;
@@ -88,36 +96,39 @@ public class GameActivity extends Activity {
 					}
 				}
 
-				checkForGameOver(human, state, status);
+				checkForGameOver(human, state);
 
 			}
 
-			/**
-			 * @param human
-			 * @param state
-			 * @param status
-			 */
-			private void checkForGameOver(final TicTacPlayer human, final TicTacGameState state,
-					TextView status) {
-
-				if (state.isDraw()) {
-					status.setText(R.string.status_draw);
-					gameOver = true;
-				}
-				else if (state.isWin()) {
-					gameOver = true;
-					if (state.isWinner(human)) {
-						status.setText(R.string.status_won);
-					}
-					else {
-						status.setText(R.string.status_lost);
-					}
-				}
-			}
 		};
 
 		for (int id : images) {
 			findViewById(id).setOnClickListener(clickListener);
+		}
+	}
+
+	private void checkForGameOver(TicTacPlayer human, TicTacGameState state) {
+		boolean gameOver = false;
+
+		if (state.isDraw()) {
+			status.setText(R.string.status_draw);
+			gameOver = true;
+		}
+		else if (state.isWin()) {
+			gameOver = true;
+			if (state.isWinner(human)) {
+				status.setText(R.string.status_won);
+			}
+			else {
+				status.setText(R.string.status_lost);
+			}
+		}
+
+		// remove onclick listeners
+		if (gameOver) {
+			for (int id : images) {
+				findViewById(id).setClickable(false);
+			}
 		}
 	}
 
